@@ -9,14 +9,20 @@ const path = require('path');
 require("dotenv").config({ path: "./config/.env" });
 require("./config/db");
 
+//Route
 const homeRoute = require("./routes/homeRoute");
+const authRoute = require("./routes/authRoute");
+const comptaRoute = require("./routes/comptaRoute");
+const gescomRoute = require("./routes/gescomRoute");
+
+// Controller
+const homeController = require("./controllers/homeController");
+
+// Middleware
 const authMiddleware = require("./middleware/authMiddleware");
 
-// Charge le middleware d'authentification
+// middleware d'authentification
 app.use(authMiddleware);
-
-// Charge le routeur de la page d'accueil
-//app.get('/homeRoute', async (req, res));
   
 // Route accessible uniquement aux utilisateurs authentifiés
 app.get("/protected", (req, res) => {
@@ -28,19 +34,21 @@ app.get("/protected", (req, res) => {
   res.send("Vous êtes authentifié !");
 });
 
-
-
-
-
 // Gère les requêtes GET vers la route /api
 app.get("/api", (req, res) => {
     res.json({ message: "Hello libasse!" });
   });
 
+  // Controller
+  app.use("/", homeController);
+
  // route
 http://localhost:5000/auth*
-  //const authRoute = require('./authController');
-    //app.use("/auth", authRoute);
+ app.use("/auth", homeRoute);
+ app.use("/auth", authRoute);
+ app.use("/auth", comptaRoute);
+ app.use("/auth", gescomRoute);
+
  
 
 // Start the server

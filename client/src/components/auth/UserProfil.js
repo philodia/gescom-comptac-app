@@ -1,7 +1,7 @@
 import React, { Component } from "react";
 import 'bootstrap/dist/css/bootstrap.min.css';
 
-class UserProfile extends Component {
+class UserProfil extends Component {
   constructor(props) {
     super(props);
     this.state = {
@@ -56,4 +56,4 @@ class UserProfile extends Component {
   }
 }
 
-export default UserProfile;
+export default UserProfil;

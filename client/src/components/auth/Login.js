@@ -1,12 +1,13 @@
-import React, { Component } from "react";
+import React, { Component } from 'react';
+import axios from 'axios';
 import 'bootstrap/dist/css/bootstrap.min.css';
 
 class Login extends Component {
   constructor(props) {
     super(props);
     this.state = {
-      email: "",
-      password: "",
+      email: '',
+      password: '',
       error: null,
     };
   }
@@ -22,22 +23,15 @@ class Login extends Component {
 
     const { email, password } = this.state;
 
-    const requestOptions = {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
+    axios
+      .post('/api/login', {
         email,
         password,
-      }),
-    };
-
-    fetch("/api/login", requestOptions)
-      .then((response) => response.json())
-      .then((data) => {
+      })
+      .then((response) => {
+        const data = response.data;
         if (data.success) {
-          this.props.history.push("/home");
+          this.props.history.push('/home');
         } else {
           this.setState({
             error: data.error,

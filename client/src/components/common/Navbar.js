@@ -1,8 +1,9 @@
 import React, { Component } from "react";
 import { BrowserRouter as Link } from "react-router-dom";
 import 'bootstrap/dist/css/bootstrap.min.css';
+import './Navbar.css';
 
-class Navbar extends Component {
+class CustomNavbar extends Component {
   render() {
     return (
       <nav className="navbar navbar-expand-lg navbar-dark bg-dark">
@@ -28,4 +29,4 @@ class Navbar extends Component {
   }
 }
 
-export default Navbar;
+export default CustomNavbar;
