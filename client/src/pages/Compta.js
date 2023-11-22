@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { Container, Row, Col, Button } from "react-bootstrap";
+import { Container, Row, Col } from "react-bootstrap";
 import axios from "axios";
 
 function Compta() {
@@ -25,11 +25,6 @@ function Compta() {
       <Row>
         <Col md={12}>
           <h1>Comptabilité</h1>
-
-          <Button variant="primary" href="/compta/comptes">Comptes</Button>
-          <Button variant="primary" href="/compta/factures">Factures</Button>
-          <Button variant="primary" href="/compta/journaux">Journaux</Button>
-          <Button variant="primary" href="/compta/balance">Balance</Button>
         </Col>
       </Row>
     </Container>

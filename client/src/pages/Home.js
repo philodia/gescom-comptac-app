@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { Button, Container, Row, Col, Image, Jumbotron } from "react-bootstrap";
+import { Container, Row, Col, Image, Jumbotron } from "react-bootstrap";
 import axios from "axios";
 
 function Home() {
@@ -30,8 +30,6 @@ function Home() {
             <p>
               Cette application permet de gérer la comptabilité et la gestion d'une entreprise.
             </p>
-            <Button variant="primary" href="/gescom">Accéder à Gescom</Button>
-            <Button variant="primary" href="/compta">Accéder à la comptabilité</Button>
           </Jumbotron>
         </Col>
       </Row>
