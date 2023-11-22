@@ -4,7 +4,8 @@ import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { Container } from "react-bootstrap";
 
 import Home from "./pages/Home";
-import GescomCompta from "./pages/GescomCompta";
+import Compta from "./pages/Compta";
+import Gescom from "./pages/Gescom";
 import Login from "./components/auth/Login";
 import Register from "./components/auth/Register";
 import UserProfil from "./components/auth/UserProfil";
@@ -30,7 +31,8 @@ class App extends Component {
     //     </Navbar> */}
           <Routes>
              <Route path="/" element={<Home />} />
-             <Route path="/gescomCompta" element={<GescomCompta />} />
+             <Route path="/Compta" element={<Compta />} />
+             <Route path="/gescom" element={<Gescom />} />
              <Route path="/login" element={<Login />} />
            <Route path="/register" element={<Register />} />
             <Route path="/userprofil" element={<UserProfil />} />

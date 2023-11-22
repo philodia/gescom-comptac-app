@@ -1,7 +1,6 @@
 const express = require('express');
 const router = express.Router();
 const mongoose = require('mongoose');
-const bcrypt = require('bcryptjs');
 
 // Connexion à la base de données MongoDB
 mongoose.connect(
@@ -17,20 +16,15 @@ const UtilisateurSchema = new mongoose.Schema({
   prénom: String,
   email: String,
   motDePasse: String,
-  type: String, // gescom ou compta
 });
 
-//const Utilisateur = mongoose.model('Utilisateur', UtilisateurSchema);
-
-// Route de gestion de la gestion commerciale
-router.get('/', (req, res) => {
+// Route de profil utilisateur
+router.get('/profil', (req, res) => {
   // Récupération de l'utilisateur connecté
   const utilisateur = req.session.utilisateur;
 
   // Envoi de la réponse
-  res.send({
-    message: 'Bienvenue sur la page de gestion commerciale',
-  });
+  res.json(utilisateur);
 });
 
 module.exports = router;

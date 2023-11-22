@@ -1,59 +1,83 @@
-import React, { Component } from "react";
-import 'bootstrap/dist/css/bootstrap.min.css';
+import React, { useState, useEffect } from "react";
+import { Button, Container, Row, Col, Input } from "react-bootstrap";
+import axios from "axios";
+import { Label } from 'node_modules/my-react-bootstrap';
 
-class UserProfil extends Component {
-  constructor(props) {
-    super(props);
-    this.state = {
-      user: {},
-      error: null,
-    };
-  }
+function UserProfil() {
+  const [user, setUser] = useState(null);
 
-  componentDidMount() {
-    const requestOptions = {
-      method: "GET",
-      headers: {
-        "Content-Type": "application/json",
-      },
-    };
-
-    fetch("/api/user", requestOptions)
-      .then((response) => response.json())
-      .then((data) => {
-        if (data.success) {
-          this.setState({
-            user: data.data,
-          });
-        } else {
-          this.setState({
-            error: data.error,
-          });
-        }
+  useEffect(() => {
+    axios
+      .get("http://localhost:5000/auth/users/me")
+      .then((response) => {
+        setUser(response.data);
       })
       .catch((error) => {
         console.log(error);
       });
+  }, []);
+
+  if (!user) {
+    return <div>Chargement...</div>;
   }
 
-  render() {
-    const { user, error } = this.state;
+  return (
+    <Container>
+      <Row>
+        <Col md={12}>
+          <h1>Profil utilisateur</h1>
 
-    return (
-      <div className="container">
-        <h1>Profil</h1>
-        {error && <div className="alert alert-danger">{error}</div>}
-        {user && (
-          <div>
-            <h2>Nom d'utilisateur</h2>
-            <p>{user.username}</p>
-            <h2>Email</h2>
-            <p>{user.email}</p>
-          </div>
-        )}
-      </div>
-    );
-  }
+          <Row>
+            <Col md={6}>
+              <Label for="username">Nom d'utilisateur</Label>
+              <Input
+                type="text"
+                name="username"
+                value={user.username}
+                readOnly
+              />
+            </Col>
+            <Col md={6}>
+              <Label for="role">Rôle</Label>
+              <Input
+                type="text"
+                name="role"
+                value={user.role}
+                readOnly
+              />
+            </Col>
+          </Row>
+
+          <Row>
+            <Col md={6}>
+              <Label for="name">Nom</Label>
+              <Input
+                type="text"
+                name="name"
+                value={user.name}
+                onChange={(e) => setUser({ ...user, name: e.target.value })}
+              />
+            </Col>
+            <Col md={6}>
+              <Label for="surname">Prénom</Label>
+              <Input
+                type="text"
+                name="surname"
+                value={user.surname}
+                onChange={(e) => setUser({ ...user, surname: e.target.value })}
+              />
+            </Col>
+          </Row>
+
+          <Row>
+            <Col md={12}>
+              <Button variant="primary" type="submit">Enregistrer</Button>
+            </Col>
+          </Row>
+        </Col>
+      </Row>
+    </Container>
+  );
 }
 
 export default UserProfil;

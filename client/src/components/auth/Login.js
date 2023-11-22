@@ -1,81 +1,72 @@
-import React, { Component } from 'react';
-import axios from 'axios';
-import 'bootstrap/dist/css/bootstrap.min.css';
+import React, { useState } from "react";
+import { Button, Container, Form, Row, Col, Input } from "react-bootstrap";
+import axios from "axios";
+import { Label } from 'react-bootstrap';
+import { Input } from 'react-bootstrap';
 
-class Login extends Component {
-  constructor(props) {
-    super(props);
-    this.state = {
-      email: '',
-      password: '',
-      error: null,
-    };
-  }
+function Login() {
+  const [username, setUsername] = useState("");
+  const [password, setPassword] = useState("");
+  const [role, setRole ] = useState("gescom");
 
-  handleChange = (event) => {
-    this.setState({
-      [event.target.name]: event.target.value,
-    });
-  };
-
-  handleSubmit = (event) => {
+  const handleSubmit = async (event) => {
     event.preventDefault();
 
-    const { email, password } = this.state;
+    const data = {
+      username,
+      password,
+      role,
+    };
 
-    axios
-      .post('/api/login', {
-        email,
-        password,
-      })
-      .then((response) => {
-        const data = response.data;
-        if (data.success) {
-          this.props.history.push('/home');
-        } else {
-          this.setState({
-            error: data.error,
-          });
-        }
-      })
-      .catch((error) => {
-        console.log(error);
-      });
+    try {
+      const response = await axios.post("http://localhost:5000/auth/login", data);
+
+      if (response.status === 200) {
+        window.location.href = `/${role}`;
+      } else {
+        alert(response.data.message);
+      }
+    } catch (error) {
+      console.log(error);
+    }
   };
 
-  render() {
-    const { email, password, error } = this.state;
+  return (
+    <Container>
+      <Row>
+        <Col md={12}>
+          <Form onSubmit={handleSubmit}>
+            <h1>Connexion</h1>
 
-    return (
-      <div className="container">
-        <h1>Connexion</h1>
-        {error && <div className="alert alert-danger">{error}</div>}
-        <form onSubmit={this.handleSubmit}>
-          <div className="form-group">
-            <label htmlFor="email">Email</label>
-            <input
-              type="email"
-              name="email"
-              value={email}
-              onChange={this.handleChange}
-              className="form-control"
+            <Label for="username">Nom d'utilisateur</Label>
+            <Input
+              type="text"
+              name="username"
+              value={username}
+              onChange={(e) => setUsername(e.target.value)}
             />
-          </div>
-          <div className="form-group">
-            <label htmlFor="password">Mot de passe</label>
-            <input
+
+            <Label for="password">Mot de passe</Label>
+            <Input
               type="password"
               name="password"
               value={password}
-              onChange={this.handleChange}
-              className="form-control"
+              onChange={(e) => setPassword(e.target.value)}
             />
-          </div>
-          <button type="submit" className="btn btn-primary">Connexion</button>
-        </form>
-      </div>
-    );
-  }
+
+            <Row>
+              <Col md={6}>
+                <Button variant="primary" type="submit">Se connecter</Button>
+              </Col>
+              <Col md={6}>
+                <Button variant="primary" type="button">S'inscrire</Button>
+              </Col>
+            </Row>
+          </Form>
+        </Col>
+      </Row>
+    </Container>
+  );
 }
 
 export default Login;

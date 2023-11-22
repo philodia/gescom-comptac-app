@@ -1,105 +1,73 @@
-import React, { Component } from "react";
-import 'bootstrap/dist/css/bootstrap.min.css';
+import React, { useState } from "react";
+import { Button, Container, Form, Row, Col, Input } from "react-bootstrap";
+import axios from "axios";
+import { Label } from 'node_modules/my-react-bootstrap';
 
-class Register extends Component {
-  constructor(props) {
-    super(props);
-    this.state = {
-      email: "",
-      password: "",
-      passwordConfirmation: "",
-      error: null,
-    };
-  }
+function Register() {
+  const [username, setUsername] = useState("");
+  const [password, setPassword] = useState("");
+  const [role, ] = useState("gescom");
 
-  handleChange = (event) => {
-    this.setState({
-      [event.target.name]: event.target.value,
-    });
-  };
-
-  handleSubmit = (event) => {
+  const handleSubmit = async (event) => {
     event.preventDefault();
 
-    const { email, password, passwordConfirmation } = this.state;
-
-    if (password !== passwordConfirmation) {
-      this.setState({
-        error: "Les mots de passe ne correspondent pas.",
-      });
-      return;
-    }
-
-    const requestOptions = {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        email,
-        password,
-      }),
+    const data = {
+      username,
+      password,
+      role,
     };
 
-    fetch("/api/register", requestOptions)
-      .then((response) => response.json())
-      .then((data) => {
-        if (data.success) {
-          this.props.history.push("/login");
-        } else {
-          this.setState({
-            error: data.error,
-          });
-        }
-      })
-      .catch((error) => {
-        console.log(error);
-      });
+    try {
+      const response = await axios.post("http://localhost:5000/auth/register", data);
+
+      if (response.status === 201) {
+        window.location.href = `/${role}`;
+      } else {
+        alert(response.data.message);
+      }
+    } catch (error) {
+      console.log(error);
+    }
   };
 
-  render() {
-    const { email, password, passwordConfirmation, error } = this.state;
+  return (
+    <Container>
+      <Row>
+        <Col md={12}>
+          <Form onSubmit={handleSubmit}>
+            <h1>Inscription</h1>
 
-    return (
-      <div className="container">
-        <h1>Inscription</h1>
-        {error && <div className="alert alert-danger">{error}</div>}
-        <form onSubmit={this.handleSubmit}>
-          <div className="form-group">
-            <label htmlFor="email">Email</label>
-            <input
-              type="email"
-              name="email"
-              value={email}
-              onChange={this.handleChange}
-              className="form-control"
+            <Label for="username">Nom d'utilisateur</Label>
+            <Input
+              type="text"
+              name="username"
+              value={username}
+              onChange={(e) => setUsername(e.target.value)}
+              required
             />
-          </div>
-          <div className="form-group">
-            <label htmlFor="password">Mot de passe</label>
-            <input
+
+            <Label for="password">Mot de passe</Label>
+            <Input
               type="password"
               name="password"
               value={password}
-              onChange={this.handleChange}
-              className="form-control"
+              onChange={(e) => setPassword(e.target.value)}
+              required
             />
-          </div>
-          <div className="form-group">
-            <label htmlFor="passwordConfirmation">Confirmation du mot de passe</label>
-            <input
-              type="password"
-              name="passwordConfirmation"
-              value={passwordConfirmation}
-              onChange={this.handleChange}
-              className="form-control"
-            />
-          </div>
-          <button type="submit" className="btn btn-primary">S'inscrire</button>
-        </form>
-      </div>
-    );
-  }
+
+            <Row>
+              <Col md={6}>
+                <Button variant="primary" type="submit">S'inscrire</Button>
+              </Col>
+              <Col md={6}>
+                <Button variant="primary" type="button">Se connecter</Button>
+              </Col>
+            </Row>
+          </Form>
+        </Col>
+      </Row>
+    </Container>
+  );
 }
 
 export default Register;

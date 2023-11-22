@@ -1,16 +1,18 @@
-import React, { Component } from "react";
-import 'bootstrap/dist/css/bootstrap.min.css';
+import React from "react";
+import { Container, Row, Col } from "react-bootstrap";
 
-class Footer extends Component {
-  render() {
-    return (
-      <footer className="footer">
-        <div className="container">
-          <span className="text-muted">Copyright &copy; 2023 Gescom-Compta</span>
-        </div>
-      </footer>
-    );
-  }
+function Footer() {
+  return (
+    <Container fluid>
+      <Row>
+        <Col md={12}>
+          <p className="text-center">
+            Copyright &copy; 2023 Gescom-Compta
+          </p>
+        </Col>
+      </Row>
+    </Container>
+  );
 }
 
 export default Footer;

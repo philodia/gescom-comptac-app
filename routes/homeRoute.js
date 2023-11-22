@@ -1,20 +1,30 @@
-const express = require("express");
+const express = require('express');
 const router = express.Router();
-const userController = require("../controllers/userController");
+const mongoose = require('mongoose');
 
-router.get("/", (req, res) => {
-  // Vérifie que l'utilisateur est authentifié
-  if (!req.auth) {
-    return res.status(401).send("Accès refusé");
-  }
+// Connexion à la base de données MongoDB
+mongoose.connect(
+  process.env.MONGO_URI, {
+  useNewUrlParser: true,
+  useUnifiedTopology: true,
+});
 
-  // L'utilisateur est authentifié, on peut lui renvoyer la réponse
-  const user = req.auth;
+// Création du modèle Utilisateur
+const UtilisateurSchema = new mongoose.Schema({
+  id: Number,
+  nom: String,
+  prénom: String,
+  email: String,
+  motDePasse: String,
+});
 
-  res.send({
-    message: "Bienvenue sur Gescom-Compta !",
-    user,
-  });
+// Route d'accueil
+router.get('/', (req, res) => {
+  // Récupération de l'utilisateur connecté
+  const utilisateur = req.session.utilisateur;
+
+  // Envoi de la réponse
+  res.send('Bienvenue sur l\'application Gescom-Compta' + (utilisateur ? `, ${utilisateur.nom} ${utilisateur.prénom}` : ''));
 });
 
 module.exports = router;

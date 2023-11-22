@@ -1,55 +1,80 @@
 // server.js
 const express = require("express");
-const app = express();
 const path = require('path');
-//const bodyParser = require('body-parser');
-//const cors = require('cors');
-//const mongoose = require("mongoose");
-//const routes = require('./routes');
+const bodyParser = require('body-parser');
+const cors = require('cors');
+const mongoose = require("mongoose");
 require("dotenv").config({ path: "./config/.env" });
 require("./config/db");
 
+// Configurer Express
+const app = express();
+app.use(cors());
+app.use(bodyParser.json());
+app.use(bodyParser.urlencoded({ extended: true }));
+app.use(express.static(path.join(__dirname, 'public')));
+
+//mongoose.model('User', User);
+mongoose.connect(
+  process.env.MONGO_URI, {
+  useNewUrlParser: true,
+  useUnifiedTopology: true,
+});
+
 //Route
 const homeRoute = require("./routes/homeRoute");
-const authRoute = require("./routes/authRoute");
+const loginRoute = require('./routes/loginRoute');
+const logoutRoute = require("./routes/logoutRoute");
+const registerRoute = require('./routes/registerRoute');
+const userprofilRoute = require('./routes/userprofilRoute');
 const comptaRoute = require("./routes/comptaRoute");
 const gescomRoute = require("./routes/gescomRoute");
 
-// Controller
-const homeController = require("./controllers/homeController");
-
-// Middleware
-const authMiddleware = require("./middleware/authMiddleware");
-
-// middleware d'authentification
-app.use(authMiddleware);
-  
-// Route accessible uniquement aux utilisateurs authentifiés
-app.get("/protected", (req, res) => {
-  // Vérifie que l'utilisateur est authentifié
-  if (!req.auth) {
-    return res.status(401).send("Accès refusé");
-  }
- // L'utilisateur est authentifié, on peut lui renvoyer la réponse
-  res.send("Vous êtes authentifié !");
+app.get('/', (req, res) => {
+  res.render('home', { title: 'Accueil' });
 });
 
-// Gère les requêtes GET vers la route /api
-app.get("/api", (req, res) => {
-    res.json({ message: "Hello libasse!" });
-  });
+// Controller
+const homeController = require('./controllers/homeController');
+const loginController = require("./controllers/loginController");
+const registerController = require("./controllers/registerController");
+const comptaController = require("./controllers/comptaController");
+const gescomController = require("./controllers/gescomController");
 
-  // Controller
-  app.use("/", homeController);
+app.use('/', homeController);
+app.use('/login', loginController);
+app.use('/register', registerController);
+app.use('/compta', comptaController);
+  app.use(gescomController);
+
+
+// Models
+const HomeModel = require('./models/HomeModel');
+const LoginModel = require('./models/LoginModel');
+const RegisterModel = require('./models/RegisterModel');
+const ComptaModel = require('./models/ComptaModel');
+const GescomModel = require('./models/GescomModel');
+
+app.use(HomeModel);
+app.use(LoginModel);
+app.use(RegisterModel);
+app.use(ComptaModel);
+app.use(GescomModel);
+
+// Middleware
+const authMiddleware = require('./middleware/authMiddleware');
+
+app.use(authMiddleware);
 
  // route
-http://localhost:5000/auth*
- app.use("/auth", homeRoute);
- app.use("/auth", authRoute);
- app.use("/auth", comptaRoute);
- app.use("/auth", gescomRoute);
-
- 
+http://localhost:5000/auth/*
+ app.use("/", homeRoute);
+ app.use("/api/login", loginRoute);
+ app.use("/logout", logoutRoute);
+ app.use("/api/register", registerRoute);
+ app.use("/api/userprofil", userprofilRoute);
+ app.use("/compta", comptaRoute);
+ app.use("/gescom", gescomRoute);
 
 // Start the server
 app.listen(process.env.PORT || 5000, () => {
