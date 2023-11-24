@@ -1,24 +1,20 @@
-import React, { Component } from "react";
-import { BrowserRouter as Route, Link } from "react-router-dom";
-import 'bootstrap/dist/css/bootstrap.min.css';
+import React from "react";
+import { BrowserRouter, Route } from "react-router-dom";
 
+import Navbar from "../common/Navbar";
 import CreateClient from "./CreateClient";
 import ListClient from "./ListClient";
 
-class Client extends Component {
-  render() {
-    return (
-      <div className="container">
-        <h1>Clients</h1>
-        <ul className="nav nav-tabs">
-          <li><Link to="/client/create">Créer</Link></li>
-          <li><Link to="/client/list">Liste</Link></li>
-        </ul>
-        <Route path="/client/create" component={CreateClient} />
-        <Route path="/client/list" component={ListClient} />
+const Clients = () => {
+  return (
+    <BrowserRouter>
+      <div>
+        <Navbar />
+          <Route path="/clients/create" component={CreateClient} />
+          <Route path="/clients" component={ListClient} />
       </div>
-    );
-  }
-}
+    </BrowserRouter>
+  );
+};
 
-export default Client;
+export default Clients;

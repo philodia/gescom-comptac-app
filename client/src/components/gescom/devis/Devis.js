@@ -1,24 +1,20 @@
-import React, { Component } from "react";
-import { BrowserRouter as Route, Link } from "react-router-dom";
-import 'bootstrap/dist/css/bootstrap.min.css';
+import React from "react";
+import { BrowserRouter, Route } from "react-router-dom";
 
+import Navbar from "../common/Navbar";
 import CreateDevis from "./CreateDevis";
 import ListDevis from "./ListDevis";
 
-class Devis extends Component {
-  render() {
-    return (
-      <div className="container">
-        <h1>Devis</h1>
-        <ul className="nav nav-tabs">
-          <li><Link to="/devis/create">Créer</Link></li>
-          <li><Link to="/devis/list">Liste</Link></li>
-        </ul>
-        <Route path="/devis/create" component={CreateDevis} />
-        <Route path="/devis/list" component={ListDevis} />
-      </div>
-    );
-  }
-}
+const Devis = () => {
+  return (
+    <BrowserRouter>
+      <div>
+        <Navbar />
+          <Route path="/devis/create" component={CreateDevis} />
+          <Route path="/devis" component={ListDevis} />
+        </div>
+    </BrowserRouter>
+  );
+};
 
 export default Devis;

@@ -1,34 +1,23 @@
-import React, { useState, useEffect } from "react";
-import { Container, Row, Col } from "react-bootstrap";
-import axios from "axios";
+import React, { useState } from "react";
+import { BrowserRouter } from "react-router-dom";
+import { SidebarCompta } from "./common/SidebarCompta";
 
-function Compta() {
-  const [user, setUser] = useState(null);
-
-  useEffect(() => {
-    axios
-      .get("/api/users/me")
-      .then((response) => {
-        setUser(response.data);
-      })
-      .catch((error) => {
-        console.log(error);
-      });
-  }, []);
-
-  if (!user) {
-    return <div>Chargement...</div>;
-  }
+const ComptaComponent = () => {
+  const [currentRoute, setCurrentRoute] = useState("");
 
   return (
-    <Container>
-      <Row>
-        <Col md={12}>
-          <h1>Comptabilité</h1>
-        </Col>
-      </Row>
-    </Container>
+    <BrowserRouter>
+      <div className="container">
+        <SidebarCompta currentRoute={currentRoute} setCurrentRoute={setCurrentRoute} />
+        <main>
+          {currentRoute === "factures" && <FacturesRoute />}
+          {currentRoute === "clients" && <ClientsRoute />}
+          {currentRoute === "devis" && <DevisRoute />}
+          {currentRoute === "bon-livraison" && <BonLivraisonRoute />}
+        </main>
+      </div>
+    </BrowserRouter>
   );
-}
+};
 
-export default Compta;
+export default ComptaComponent;

@@ -1,73 +1,93 @@
 import React, { useState } from "react";
-import { Button, Container, Form, Row, Col, Input } from "react-bootstrap";
+import { BrowserRouter } from "react-router-dom";
 import axios from "axios";
-import { Label } from 'node_modules/my-react-bootstrap';
 
-function Register() {
-  const [username, setUsername] = useState("");
+import Navbar from "../common/Navbar";
+
+const Register = () => {
+  const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const [role, ] = useState("gescom");
+  const [nom, setNom] = useState("");
+  const [prenom, setPrenom] = useState("");
+  const [option, setOption] = useState("gescom");
 
-  const handleSubmit = async (event) => {
-    event.preventDefault();
+  const handleSubmit = (e) => {
+    e.preventDefault();
 
-    const data = {
-      username,
-      password,
-      role,
-    };
-
-    try {
-      const response = await axios.post("http://localhost:5000/auth/register", data);
-
-      if (response.status === 201) {
-        window.location.href = `/${role}`;
-      } else {
-        alert(response.data.message);
-      }
-    } catch (error) {
-      console.log(error);
-    }
+    axios
+      .post("/api/register", {
+        email,
+        password,
+        nom,
+        prenom,
+        option,
+      })
+      .then((response) => {
+        if (response.data.success) {
+          window.location.href = "/";
+        } else {
+          alert(response.data.message);
+        }
+      })
+      .catch((error) => {
+        console.log(error);
+      });
   };
 
   return (
-    <Container>
-      <Row>
-        <Col md={12}>
-          <Form onSubmit={handleSubmit}>
-            <h1>Inscription</h1>
-
-            <Label for="username">Nom d'utilisateur</Label>
-            <Input
-              type="text"
-              name="username"
-              value={username}
-              onChange={(e) => setUsername(e.target.value)}
-              required
+    <BrowserRouter>
+      <div>
+        <Navbar />
+        <h1>Inscription</h1>
+        <form onSubmit={handleSubmit}>
+          <div>
+            <label htmlFor="email">Email</label>
+            <input
+              type="email"
+              name="email"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
             />
-
-            <Label for="password">Mot de passe</Label>
-            <Input
+          </div>
+          <div>
+            <label htmlFor="password">Mot de passe</label>
+            <input
               type="password"
               name="password"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
-              required
             />
-
-            <Row>
-              <Col md={6}>
-                <Button variant="primary" type="submit">S'inscrire</Button>
-              </Col>
-              <Col md={6}>
-                <Button variant="primary" type="button">Se connecter</Button>
-              </Col>
-            </Row>
-          </Form>
-        </Col>
-      </Row>
-    </Container>
+          </div>
+          <div>
+            <label htmlFor="nom">Nom</label>
+            <input
+              type="text"
+              name="nom"
+              value={nom}
+              onChange={(e) => setNom(e.target.value)}
+            />
+          </div>
+          <div>
+            <label htmlFor="prenom">Prénom</label>
+            <input
+              type="text"
+              name="prenom"
+              value={prenom}
+              onChange={(e) => setPrenom(e.target.value)}
+            />
+          </div>
+          <div>
+            <label htmlFor="option">Option</label>
+            <select name="option" onChange={(e) => setOption(e.target.value)}>
+              <option value="gescom">Gescom</option>
+              <option value="compta">Compta</option>
+            </select>
+          </div>
+          <button type="submit">S'inscrire</button>
+        </form>
+      </div>
+    </BrowserRouter>
   );
-}
+};
 
 export default Register;

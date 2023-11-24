@@ -1,18 +1,29 @@
-import React from "react";
-import { Container, Row, Col } from "react-bootstrap";
+import React, { Component } from 'react';
+import { Container, Row, Col, Nav } from 'react-bootstrap';
+import "./Footer.css";
 
-function Footer() {
-  return (
-    <Container fluid>
-      <Row>
-        <Col md={12}>
-          <p className="text-center">
-            Copyright &copy; 2023 Gescom-Compta
-          </p>
-        </Col>
-      </Row>
-    </Container>
-  );
+class Footer extends Component {
+  render() {
+    return (
+      <Container>
+        <Row>
+          <Col>
+            <Nav>
+              <Nav.Link href="#">Mentions légales</Nav.Link>
+              <Nav.Link href="#">Conditions générales d'utilisation</Nav.Link>
+            </Nav>
+          </Col>
+        </Row>
+        <Row>
+          <Col>
+            <p>
+              Copyright © 2023 Gescom-Compta. Tous droits réservés.
+            </p>
+          </Col>
+        </Row>
+      </Container>
+    );
+  }
 }
 
 export default Footer;

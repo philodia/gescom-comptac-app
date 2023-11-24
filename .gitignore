@@ -1,0 +1,6 @@
+# config 
+/.env
+/db.js
+
+# serveur 
+/server.js

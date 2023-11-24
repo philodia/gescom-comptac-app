@@ -1,44 +1,45 @@
-import React, { useState, useEffect } from "react";
-import { Nav, NavDropdown, DropdownMenu, DropdownItem } from "react-bootstrap";
+import React, { useState } from "react";
+import { Navbar, Nav, NavItem, NavLink, DropdownToggle, DropdownMenu, DropdownItem } from "react-bootstrap";
 import axios from "axios";
+const NavbarComponent = () => {
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
 
-function Navbar() {
-  const [user, setUser] = useState(null);
-
-  useEffect(() => {
-    axios
-      .get("/api/users/me")
-      .then((response) => {
-        setUser(response.data);
-      })
-      .catch((error) => {
-        console.log(error);
-      });
-  }, []);
+  const handleLogout = () => {
+    setIsLoggedIn(false);
+    axios.post("/api/logout").then(() => {
+      window.location.href = "/";
+    });
+  };
 
   return (
-    <Navbar bg="light" expand="lg">
+    <Navbar bg="Dark" variant="light">
       <Navbar.Brand href="/">Gescom-Compta</Navbar.Brand>
-      <Navbar.Toggle aria-controls="basic-navbar-nav" />
-      <Navbar.Collapse id="basic-navbar-nav">
-        <NavDropdown title={user ? user.name : "Utilisateur"} id="basic-nav-dropdown">
-          {user && (
-            <DropdownMenu>
-              <DropdownItem href="/auth/profil">Mon profil</DropdownItem>
-              <DropdownItem href="/auth/logout">Déconnexion</DropdownItem>
-            </DropdownMenu>
-          )}
-          {!user && (
-            <DropdownMenu>
-              <DropdownItem href="/auth/login">Connexion</DropdownItem>
-              <DropdownItem href="/auth/register">Inscription</DropdownItem>
-            </DropdownMenu>
-          )}
-          <Nav.Link href="/help">Aide</Nav.Link>
-        </NavDropdown>
-      </Navbar.Collapse>
+      <Nav className="mr-auto">
+        <NavItem>
+          <NavLink href="/clients">Clients</NavLink>
+        </NavItem>
+        <NavItem>
+          <NavLink href="/factures">Factures</NavLink>
+        </NavItem>
+        <NavItem>
+          <NavLink href="/produits">Produits</NavLink>
+        </NavItem>
+      </Nav>
+      {isLoggedIn && (
+        <Nav>
+          <DropdownToggle caret={true} id="navbarDropdown">
+            <NavLink href="#">Mon compte</NavLink>
+          </DropdownToggle>
+          <DropdownMenu id="navbarDropdownMenu" aria-labelledby="navbarDropdown">
+            <DropdownItem href="/compte">Mon profil</DropdownItem>
+            <DropdownItem href="#">Mes factures</DropdownItem>
+            <DropdownItem href="#">Mes produits</DropdownItem>
+            <DropdownItem href="#" onClick={handleLogout}>Déconnexion</DropdownItem>
+          </DropdownMenu>
+        </Nav>
+      )}
     </Navbar>
   );
-}
+};
 
-export default Navbar;
+export default NavbarComponent;

@@ -1,130 +1,73 @@
-import React, { Component } from "react";
-import 'bootstrap/dist/css/bootstrap.min.css';
+import React, { useState } from "react";
+import { Button, Form, FormGroup, Input, Label } from "react-bootstrap";
+import { axios } from "axios";
 
-class CreateDevis extends Component {
-  constructor(props) {
-    super(props);
-    this.state = {
-      numero: "",
-      client: null,
-      date: "",
-      montant: "",
-      error: null,
-    };
-  }
+const CreateDevisComponent = () => {
+  const [devis, setDevis] = useState({
+    client: { id: 1 },
+    date: "",
+    montant: "",
+  });
 
-  handleChange = (event) => {
-    this.setState({
-      [event.target.name]: event.target.value,
-    });
-  };
-
-  handleSubmit = (event) => {
+  const handleSubmit = (event) => {
     event.preventDefault();
 
-    const { numero, client, date, montant } = this.state;
-
-    const requestOptions = {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        numero,
-        client,
-        date,
-        montant,
-      }),
-    };
-
-    fetch("/api/devis", requestOptions)
-      .then((response) => response.json())
-      .then((data) => {
-        if (data.success) {
-          this.props.history.push("/devis/list");
-        } else {
-          this.setState({
-            error: data.error,
-          });
-        }
+    axios
+      .post("/api/devis", devis)
+      .then((response) => {
+        setDevis(response.data);
+        window.location.href = "/devis";
       })
       .catch((error) => {
-        console.log(error);
+        console.error(error);
       });
   };
 
-  render() {
-    const { numero, client, date, montant, error } = this.state;
+  return (
+    <div className="container">
+      <h1>Créer un devis</h1>
 
-    return (
-      <div className="container">
-        <h1>Créer un devis</h1>
-        {error && <div className="alert alert-danger">{error}</div>}
-        <form onSubmit={this.handleSubmit}>
-          <div className="form-group">
-            <label htmlFor="numero">Numéro</label>
-            <input
-              type="text"
-              name="numero"
-              value={numero}
-              onChange={this.handleChange}
-              className="form-control"
-            />
-          </div>
-          <div className="form-group">
-            <label htmlFor="client">Client</label>
-            <select
-              name="client"
-              value={client}
-              onChange={this.handleChange}
-              className="form-control"
-            >
-              <option value="">-- Choisir un client --</option>
-              {this.getClientsOptions()}
-            </select>
-          </div>
-          <div className="form-group">
-            <label htmlFor="date">Date</label>
-            <input
-              type="date"
-              name="date"
-              value={date}
-              onChange={this.handleChange}
-              className="form-control"
-            />
-          </div>
-          <div className="form-group">
-            <label htmlFor="montant">Montant</label>
-            <input
-              type="number"
-              name="montant"
-              value={montant}
-              onChange={this.handleChange}
-              className="form-control"
-            />
-          </div>
-          <button type="submit" className="btn btn-primary">Créer</button>
-        </form>
-      </div>
-    );
-  }
+      <Form onSubmit={handleSubmit}>
+        <FormGroup>
+          <Label for="client">Client</Label>
+          <Input
+            type="select"
+            name="client"
+            id="client"
+            value={devis.client.id}
+            onChange={(event) => setDevis({ ...devis, client: event.target.value })}
+          >
+            <option value={1}>Jean Dupont</option>
+            <option value={2}>Marie Martin</option>
+          </Input>
+        </FormGroup>
 
-  getClientsOptions() {
-    const clients = [
-      {
-        id: 1,
-        name: "John Doe",
-      },
-      {
-        id: 2,
-        name: "Jane Doe",
-      },
-    ];
+        <FormGroup>
+          <Label for="date">Date</Label>
+          <Input
+            type="date"
+            name="date"
+            id="date"
+            value={devis.date}
+            onChange={(event) => setDevis({ ...devis, date: event.target.value })}
+          />
+        </FormGroup>
 
-    return clients.map((client) => (
-      <option key={client.id} value={client.id}>{client.name}</option>
-    ));
-  }
-}
+        <FormGroup>
+          <Label for="montant">Montant</Label>
+          <Input
+            type="number"
+            name="montant"
+            id="montant"
+            value={devis.montant}
+            onChange={(event) => setDevis({ ...devis, montant: event.target.value })}
+          />
+        </FormGroup>
 
-export default CreateDevis;
+        <Button type="submit">Enregistrer</Button>
+      </Form>
+    </div>
+  );
+};
+
+export default CreateDevisComponent;

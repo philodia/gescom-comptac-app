@@ -1,77 +1,57 @@
-import React, { Component } from "react";
-import 'bootstrap/dist/css/bootstrap.min.css';
+import React, { useEffect, useState } from "react";
+import { Button, Table, Thead, Th, Tr, Td } from "react-bootstrap";
+import { axios } from "axios";
 
-class ListClient extends Component {
-  constructor(props) {
-    super(props);
-    this.state = {
-      clients: [],
-      error: null,
-    };
-  }
+const ListClientComponent = () => {
+  const [clients, setClients] = useState([]);
 
-  componentDidMount() {
-    const requestOptions = {
-      method: "GET",
-      headers: {
-        "Content-Type": "application/json",
-      },
-    };
-
-    fetch("/api/clients", requestOptions)
-      .then((response) => response.json())
-      .then((data) => {
-        if (data.success) {
-          this.setState({
-            clients: data.data,
-          });
-        } else {
-          this.setState({
-            error: data.error,
-          });
-        }
+  const handleGetClients = () => {
+    axios
+      .get("/api/clients")
+      .then((response) => {
+        setClients(response.data);
       })
       .catch((error) => {
-        console.log(error);
+        console.error(error);
       });
-  }
+  };
 
-  render() {
-    const { clients, error } = this.state;
+  useEffect(() => {
+    handleGetClients();
+  }, []);
 
-    return (
-      <div className="container">
-        <h1>Liste des clients</h1>
-        {error && <div className="alert alert-danger">{error}</div>}
-        {clients.length > 0 && (
-          <table className="table table-striped">
-            <thead>
-              <tr>
-                <th>Nom</th>
-                <th>Email</th>
-                <th>Téléphone</th>
-                <th>Adresse</th>
-                <th>Ville</th>
-                <th>Pays</th>
-              </tr>
-            </thead>
-            <tbody>
-              {clients.map((client) => (
-                <tr key={client.id}>
-                  <td>{client.name}</td>
-                  <td>{client.email}</td>
-                  <td>{client.phone}</td>
-                  <td>{client.address}</td>
-                  <td>{client.city}</td>
-                  <td>{client.country}</td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        )}
-      </div>
-    );
-  }
-}
+  return (
+    <div className="container">
+      <h1>Liste des clients</h1>
 
-export default ListClient;
+      <Table striped bordered hover>
+        <Thead>
+          <Tr>
+            <Th>Nom</Th>
+            <Th>Prénom</Th>
+            <Th>Email</Th>
+            <Th>Téléphone</Th>
+            <Th></Th>
+          </Tr>
+        </Thead>
+        <tbody>
+          {clients.map((client) => (
+            <Tr key={client.id}>
+              <Td>{client.nom}</Td>
+              <Td>{client.prenom}</Td>
+              <Td>{client.email}</Td>
+              <Td>{client.telephone}</Td>
+              <Td>
+                <Button variant="primary" onClick={() => window.location.href = `/clients/${client.id}`}>
+                  Voir
+                </Button>
+              </Td>
+            </Tr>
+          ))}
+        </tbody>
+      </Table>
+    </div>
+  );
+};
+
+export default ListClientComponent;

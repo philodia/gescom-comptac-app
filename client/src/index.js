@@ -3,39 +3,41 @@ import ReactDOM from "react-dom";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { Container } from "react-bootstrap";
 
-import Home from "./pages/Home";
-import Compta from "./pages/Compta";
-import Gescom from "./pages/Gescom";
+import HomeComponent from "./pages/Home";
+import ComptaComponent from "./pages/Compta";
+import GescomComponent from "./pages/Gescom";
 import Login from "./components/auth/Login";
+import Logout from "./components/auth/Logout";
 import Register from "./components/auth/Register";
 import UserProfil from "./components/auth/UserProfil";
 import Footer from "./components/common/Footer";
-import CustomNavbar from "./components/common/Navbar";
+import NavbarComponent from "./components/common/Navbar";
 
 class App extends Component {
   render() {
     return (
       <>
       
-          <CustomNavbar/>
+          <NavbarComponent/>
         <BrowserRouter>
        <Container>
         {/*}  <Navbar bg="dark" variant="dark">
-      //       <Navbar.Brand href="/">Gescom-Compta</Navbar.Brand>
-      //       <Nav>
-      //         <Nav.Link href="/">Accueil</Nav.Link>
-      //         <Nav.Link href="/login">Connexion</Nav.Link>
-      //         <Nav.Link href="/register">Inscription</Nav.Link>
-      //         <Nav.Link href="/userprofil">Profil</Nav.Link>
-      //       </Nav>
-    //     </Navbar> */}
+              <Navbar.Brand href="/">Gescom-Compta</Navbar.Brand>
+              <Nav>
+               <Nav.Link href="/">Accueil</Nav.Link>
+               <Nav.Link href="/login">Connexion</Nav.Link>
+               <Nav.Link href="/register">Inscription</Nav.Link>
+               <Nav.Link href="/userprofil">Profil</Nav.Link>
+              </Nav>
+           </Navbar> */}
           <Routes>
-             <Route path="/" element={<Home />} />
-             <Route path="/Compta" element={<Compta />} />
-             <Route path="/gescom" element={<Gescom />} />
+             <Route path="/" element={<HomeComponent />} />
+             <Route path="/Compta" element={<ComptaComponent />} />
+             <Route path="/gescom" element={<GescomComponent />} />
              <Route path="/login" element={<Login />} />
-           <Route path="/register" element={<Register />} />
-            <Route path="/userprofil" element={<UserProfil />} />
+             <Route path="/logout" element={<Logout />} />
+             <Route path="/register" element={<Register />} />
+             <Route path="/userprofil" element={<UserProfil />} />
              <Route path="/footer" element={<Footer />} />
            </Routes>
          </Container>

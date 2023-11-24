@@ -1,34 +1,27 @@
-import React, { useState, useEffect } from "react";
-import { Container, Row, Col } from "react-bootstrap";
-import axios from "axios";
+import React, { useState } from "react";
+import { BrowserRouter } from "react-router-dom";
+import { SidebarGescom } from "../components/common/SidebarGescom";
+import ClientsRoute from "../components/gescom/clients/Client";
+import DevisRoute from "../components/gescom/devis/Devis";
+import ProduitRoute from "../components/gescom/produits/Produit";
+import BonLivraisonRoute from "../components/gescom/bonlivraison/BonLivraison";
 
-function Gescom() {
-  const [user, setUser] = useState(null);
-
-  useEffect(() => {
-    axios
-      .get("/api/users/me")
-      .then((response) => {
-        setUser(response.data);
-      })
-      .catch((error) => {
-        console.log(error);
-      });
-  }, []);
-
-  if (!user) {
-    return <div>Chargement...</div>;
-  }
+const GescomComponent = () => {
+  const [currentRoute, setCurrentRoute] = useState("");
 
   return (
-    <Container>
-      <Row>
-        <Col md={12}>
-          <h1>Gestion</h1>
-        </Col>
-      </Row>
-    </Container>
+    <BrowserRouter>
+      <div className="container">
+        <SidebarGescom currentRoute={currentRoute} setCurrentRoute={setCurrentRoute} />
+        <main>
+          {currentRoute === "clients" && <ClientsRoute />}
+          {currentRoute === "devis" && <DevisRoute />}
+          {currentRoute === "produits" && <ProduitRoute />}
+          {currentRoute === "bon-livraison" && <BonLivraisonRoute />}
+        </main>
+      </div>
+    </BrowserRouter>
   );
-}
+};
 
-export default Gescom;
+export default GescomComponent;

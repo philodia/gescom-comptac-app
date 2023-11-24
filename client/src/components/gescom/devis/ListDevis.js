@@ -1,73 +1,47 @@
-import React, { Component } from "react";
-import 'bootstrap/dist/css/bootstrap.min.css';
+import React, { useState, useEffect } from "react";
+import { Table, Thead, Tr, Th, Td } from "react-bootstrap";
+import { axios } from "axios";
 
-class ListDevis extends Component {
-  constructor(props) {
-    super(props);
-    this.state = {
-      devis: [],
-      error: null,
-    };
-  }
+const ListDevisComponent = () => {
+  const [devis, setDevis] = useState([]);
 
-  componentDidMount() {
-    const requestOptions = {
-      method: "GET",
-      headers: {
-        "Content-Type": "application/json",
-      },
-    };
-
-    fetch("/api/devis", requestOptions)
-      .then((response) => response.json())
-      .then((data) => {
-        if (data.success) {
-          this.setState({
-            devis: data.data,
-          });
-        } else {
-          this.setState({
-            error: data.error,
-          });
-        }
+  useEffect(() => {
+    axios
+      .get("/api/devis")
+      .then((response) => {
+        setDevis(response.data);
       })
       .catch((error) => {
-        console.log(error);
+        console.error(error);
       });
-  }
+  }, []);
 
-  render() {
-    const { devis, error } = this.state;
+  return (
+    <div className="container">
+      <h1>Liste des devis</h1>
 
-    return (
-      <div className="container">
-        <h1>Liste des devis</h1>
-        {error && <div className="alert alert-danger">{error}</div>}
-        {devis.length > 0 && (
-          <table className="table table-striped">
-            <thead>
-              <tr>
-                <th>Numéro</th>
-                <th>Client</th>
-                <th>Date</th>
-                <th>Montant</th>
-              </tr>
-            </thead>
-            <tbody>
-              {devis.map((devis) => (
-                <tr key={devis.id}>
-                  <td>{devis.numero}</td>
-                  <td>{devis.client.name}</td>
-                  <td>{devis.date}</td>
-                  <td>{devis.montant}</td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        )}
-      </div>
-    );
-  }
-}
+      <Table striped bordered hover>
+        <Thead>
+          <Tr>
+            <Th>Numéro</Th>
+            <Th>Client</Th>
+            <Th>Date</Th>
+            <Th>Montant</Th>
+          </Tr>
+        </Thead>
+        <tbody>
+          {devis.map((devis) => (
+            <Tr key={devis.id}>
+              <Td>{devis.numero}</Td>
+              <Td>{devis.client.nom}</Td>
+              <Td>{devis.date}</Td>
+              <Td>{devis.montant}</Td>
+            </Tr>
+          ))}
+        </tbody>
+      </Table>
+    </div>
+  );
+};
 
-export default ListDevis;
+export default ListDevisComponent;

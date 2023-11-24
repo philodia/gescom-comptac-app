@@ -1,83 +1,65 @@
-import React, { useState, useEffect } from "react";
-import { Button, Container, Row, Col, Input } from "react-bootstrap";
-import axios from "axios";
-import { Label } from 'node_modules/my-react-bootstrap';
+import React, { useState } from "react";
+import { Button, Form, FormGroup, Input, Label } from "react-bootstrap";
+import Axios from "axios";
 
-function UserProfil() {
-  const [user, setUser] = useState(null);
+const UserProfil = () => {
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [option, setOption] = useState("gescom");
 
-  useEffect(() => {
-    axios
-      .get("http://localhost:5000/auth/users/me")
+  const handleSubmit = (e) => {
+    e.preventDefault();
+
+    Axios.post("/api/auth/update-profil", {
+      email,
+      password,
+      option,
+    })
       .then((response) => {
-        setUser(response.data);
+        if (response.status === 200) {
+          alert("Profil mis à jour avec succès");
+        } else {
+          alert(response.data.error);
+        }
       })
       .catch((error) => {
         console.log(error);
       });
-  }, []);
-
-  if (!user) {
-    return <div>Chargement...</div>;
-  }
+  };
 
   return (
-    <Container>
-      <Row>
-        <Col md={12}>
-          <h1>Profil utilisateur</h1>
-
-          <Row>
-            <Col md={6}>
-              <Label for="username">Nom d'utilisateur</Label>
-              <Input
-                type="text"
-                name="username"
-                value={user.username}
-                readOnly
-              />
-            </Col>
-            <Col md={6}>
-              <Label for="role">Rôle</Label>
-              <Input
-                type="text"
-                name="role"
-                value={user.role}
-                readOnly
-              />
-            </Col>
-          </Row>
-
-          <Row>
-            <Col md={6}>
-              <Label for="name">Nom</Label>
-              <Input
-                type="text"
-                name="name"
-                value={user.name}
-                onChange={(e) => setUser({ ...user, name: e.target.value })}
-              />
-            </Col>
-            <Col md={6}>
-              <Label for="surname">Prénom</Label>
-              <Input
-                type="text"
-                name="surname"
-                value={user.surname}
-                onChange={(e) => setUser({ ...user, surname: e.target.value })}
-              />
-            </Col>
-          </Row>
-
-          <Row>
-            <Col md={12}>
-              <Button variant="primary" type="submit">Enregistrer</Button>
-            </Col>
-          </Row>
-        </Col>
-      </Row>
-    </Container>
+    <div className="container">
+      <Form onSubmit={handleSubmit}>
+        <FormGroup controlId="email">
+          <Label for="email">Email</Label>
+          <Input
+            type="email"
+            name="email"
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
+          />
+        </FormGroup>
+        <FormGroup controlId="password">
+          <Label for="password">Mot de passe</Label>
+          <Input
+            type="password"
+            name="password"
+            value={password}
+            onChange={(e) => setPassword(e.target.value)}
+          />
+        </FormGroup>
+        <FormGroup controlId="option">
+          <Label for="option">Option</Label>
+          <select name="option" onChange={(e) => setOption(e.target.value)}>
+            <option value="gescom">Gescom</option>
+            <option value="compta">Compta</option>
+            <option value="admin">Admin</option>
+          </select>
+        </FormGroup>
+        <Button type="submit">Mettre à jour le profil</Button>
+      </Form>
+    </div>
   );
-}
+};
 
 export default UserProfil;
