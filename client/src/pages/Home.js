@@ -1,25 +1,45 @@
-import React from "react";
-import { BrowserRouter } from "react-router-dom";
-
-import Navbar from "../components/common/Navbar";
+import React, { useState, useEffect } from "react";
+import { Image } from "react-bootstrap"
+import { useHistory } from "react-router";
+import axios from "axios";
 
 const Home = () => {
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const history = useHistory();
+
+  useEffect(() => {
+    axios
+      .get("/api/users/me")
+      .then((response) => {
+        setIsLoggedIn(response.data.isLoggedIn);
+      })
+      .catch((error) => {
+        console.log(error);
+      });
+  }, []);
+
+  const handleLogin = () => {
+    history.push("/login");
+  };
+
+  const handleUserProfile = () => {
+    if (isLoggedIn) {
+      history.push("/profil");
+    } else {
+      handleLogin();
+    }
+  };
+
   return (
-    <BrowserRouter>
-      <div>
-        <Navbar />
-        <h1>Bienvenue sur Gescom-Compta</h1>
-        <p>
-          Cette application vous permet de gérer votre comptabilité de manière simple et
-          efficace.
-        </p>
-        <p>
-          Pour commencer, vous devez vous connecter ou créer un compte.
-        </p>
-        <button onClick={() => window.location.href="/login"}>Se connecter</button>
-        <button onClick={() => window.location.href="/register"}>S'inscrire</button>
+    <div>
+      <div className="container">
+        <div className="row">
+          <div className="col-md-12">
+            <Image src="https://source.unsplash.com/random/1920x1080" alt="Image de garde" />
+          </div>
+        </div>
       </div>
-    </BrowserRouter>
+    </div>
   );
 };
 

@@ -1,7 +1,7 @@
 import React from "react";
 import { BrowserRouter, Switch, Route } from "react-router-dom";
 
-import Navbar from "../common/Navbar";
+import Navbar from "../../common/Navbar";
 import CreateBonLivraison from "./CreateBonLivraison";
 import ListBonLivraison from "./ListBonLivraison";
 

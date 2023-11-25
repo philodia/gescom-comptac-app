@@ -1,26 +1,44 @@
-import React, { useState } from "react";
-import { Button, Form, FormGroup, Input, Label } from "react-bootstrap";
-import Axios from "axios";
+import React, { useState, useEffect } from "react";
+import { Label, Input, Button } from "react-bootstrap";
+import { useHistory } from "react-router-dom";
+import axios from "axios";
 
 const UserProfil = () => {
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
-  const [option, setOption] = useState("gescom");
+  const [user, setUser] = useState({
+    id: null,
+    nom: "",
+    prenom: "",
+    email: "",
+  });
 
-  const handleSubmit = (e) => {
-    e.preventDefault();
+  const history = useHistory();
 
-    Axios.post("/api/auth/update-profil", {
-      email,
-      password,
-      option,
-    })
+  useEffect(() => {
+    axios
+      .get("/api/users/me")
       .then((response) => {
-        if (response.status === 200) {
-          alert("Profil mis à jour avec succès");
-        } else {
-          alert(response.data.error);
-        }
+        setUser(response.data);
+      })
+      .catch((error) => {
+        console.log(error);
+      });
+  }, []);
+
+  const handleUpdate = (event) => {
+    const { name, value } = event.target;
+
+    setUser({
+      ...user,
+      [name]: value,
+    });
+  };
+
+  const handleSave = () => {
+    axios
+      .put("/api/users/me", user)
+      .then((response) => {
+        setUser(response.data);
+        history.push("/");
       })
       .catch((error) => {
         console.log(error);
@@ -29,35 +47,39 @@ const UserProfil = () => {
 
   return (
     <div className="container">
-      <Form onSubmit={handleSubmit}>
-        <FormGroup controlId="email">
-          <Label for="email">Email</Label>
+      <h1>Profil utilisateur</h1>
+      <div className="row">
+        <div className="col-md-6">
+          <Label htmlFor="nom">Nom</Label>
           <Input
+            id="nom"
+            type="text"
+            value={user.nom}
+            onChange={handleUpdate}
+          />
+        </div>
+        <div className="col-md-6">
+          <Label htmlFor="prenom">Prénom</Label>
+          <Input
+            id="prenom"
+            type="text"
+            value={user.prenom}
+            onChange={handleUpdate}
+          />
+        </div>
+      </div>
+      <div className="row">
+        <div className="col-md-12">
+          <Label htmlFor="email">Email</Label>
+          <Input
+            id="email"
             type="email"
-            name="email"
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
+            value={user.email}
+            onChange={handleUpdate}
           />
-        </FormGroup>
-        <FormGroup controlId="password">
-          <Label for="password">Mot de passe</Label>
-          <Input
-            type="password"
-            name="password"
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
-          />
-        </FormGroup>
-        <FormGroup controlId="option">
-          <Label for="option">Option</Label>
-          <select name="option" onChange={(e) => setOption(e.target.value)}>
-            <option value="gescom">Gescom</option>
-            <option value="compta">Compta</option>
-            <option value="admin">Admin</option>
-          </select>
-        </FormGroup>
-        <Button type="submit">Mettre à jour le profil</Button>
-      </Form>
+        </div>
+      </div>
+      <Button onClick={handleSave}>Enregistrer</Button>
     </div>
   );
 };

@@ -1,23 +1,38 @@
-import React, { useState } from "react";
-import { BrowserRouter } from "react-router-dom";
-import { SidebarCompta } from "./common/SidebarCompta";
+import React, { useState, useEffect } from "react";
+import { useHistory } from "react-router-dom";
+import axios from "axios";
+import Sidebar from "../components/common/SidebarCompta";
 
-const ComptaComponent = () => {
-  const [currentRoute, setCurrentRoute] = useState("");
+const Compta = () => {
+  const [user, setUser] = useState({
+    id: null,
+    nom: "",
+    prenom: "",
+    email: "",
+  });
+
+  const history = useHistory();
+
+  useEffect(() => {
+    axios
+      .get("/api/users/me")
+      .then((response) => {
+        setUser(response.data);
+      })
+      .catch((error) => {
+        console.log(error);
+      });
+  }, []);
 
   return (
-    <BrowserRouter>
-      <div className="container">
-        <SidebarCompta currentRoute={currentRoute} setCurrentRoute={setCurrentRoute} />
-        <main>
-          {currentRoute === "factures" && <FacturesRoute />}
-          {currentRoute === "clients" && <ClientsRoute />}
-          {currentRoute === "devis" && <DevisRoute />}
-          {currentRoute === "bon-livraison" && <BonLivraisonRoute />}
-        </main>
-      </div>
-    </BrowserRouter>
+    <div className="container">
+      <Sidebar />
+      <h1>Comptabilité</h1>
+      <p>
+        Cette page permet de gérer la comptabilité de l'entreprise.
+      </p>
+    </div>
   );
 };
 
-export default ComptaComponent;
+export default Compta;

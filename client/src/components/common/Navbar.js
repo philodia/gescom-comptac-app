@@ -1,45 +1,53 @@
-import React, { useState } from "react";
-import { Navbar, Nav, NavItem, NavLink, DropdownToggle, DropdownMenu, DropdownItem } from "react-bootstrap";
+import React, { useState, useEffect } from "react";
+import { useHistory } from "react-router-dom";
 import axios from "axios";
-const NavbarComponent = () => {
-  const [isLoggedIn, setIsLoggedIn] = useState(false);
+import { Navbar as Nav, NavDropdown } from "react-bootstrap";
+
+const Navbar = () => {
+  const [user, setUser] = useState({
+    id: null,
+    nom: "",
+    prenom: "",
+    email: "",
+  });
+
+  const history = useHistory();
+
+  useEffect(() => {
+    axios
+      .get("/api/users/me")
+      .then((response) => {
+        setUser(response.data);
+      })
+      .catch((error) => {
+        console.log(error);
+      });
+  }, []);
 
   const handleLogout = () => {
-    setIsLoggedIn(false);
-    axios.post("/api/logout").then(() => {
-      window.location.href = "/";
-    });
+    axios.post("/api/users/logout");
+    history.push("/");
   };
 
   return (
-    <Navbar bg="Dark" variant="light">
+    <Navbar bg="light" expand="lg">
       <Navbar.Brand href="/">Gescom-Compta</Navbar.Brand>
-      <Nav className="mr-auto">
-        <NavItem>
-          <NavLink href="/clients">Clients</NavLink>
-        </NavItem>
-        <NavItem>
-          <NavLink href="/factures">Factures</NavLink>
-        </NavItem>
-        <NavItem>
-          <NavLink href="/produits">Produits</NavLink>
-        </NavItem>
-      </Nav>
-      {isLoggedIn && (
-        <Nav>
-          <DropdownToggle caret={true} id="navbarDropdown">
-            <NavLink href="#">Mon compte</NavLink>
-          </DropdownToggle>
-          <DropdownMenu id="navbarDropdownMenu" aria-labelledby="navbarDropdown">
-            <DropdownItem href="/compte">Mon profil</DropdownItem>
-            <DropdownItem href="#">Mes factures</DropdownItem>
-            <DropdownItem href="#">Mes produits</DropdownItem>
-            <DropdownItem href="#" onClick={handleLogout}>Déconnexion</DropdownItem>
-          </DropdownMenu>
+      <Navbar.Toggle aria-controls="basic-navbar-nav" />
+      <Navbar.Collapse id="basic-navbar-nav">
+        <Nav className="mr-auto">
+          <Nav.Link href="/">Accueil</Nav.Link>
+          <Nav.Link href="/profil">Mon profil</Nav.Link>
         </Nav>
-      )}
+        <NavDropdown title="Connexion" id="basic-nav-dropdown">
+          {!user.id ? (
+            <NavDropdown.Item href="/login">Se connecter</NavDropdown.Item>
+          ) : (
+            <NavDropdown.Item onClick={handleLogout}>Se déconnecter</NavDropdown.Item>
+          )}
+        </NavDropdown>
+      </Navbar.Collapse>
     </Navbar>
   );
 };
 
-export default NavbarComponent;
+export default Navbar;

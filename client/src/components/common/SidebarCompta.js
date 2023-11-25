@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import { NavLink } from "react-router-dom";
 import { Button } from "react-bootstrap";
 
-const SidebarComptaComponent = () => {
+const SidebarCompta = () => {
   const [currentRoute, setCurrentRoute] = useState("");
 
   return (
@@ -40,4 +40,4 @@ const SidebarComptaComponent = () => {
   );
 };
 
-export default SidebarComptaComponent;
+export default SidebarCompta;
