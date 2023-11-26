@@ -1,43 +1,24 @@
 const express = require("express");
-const userModel = require("./models/User");
+const bcrypt = require("bcryptjs");
+const jwt = require("jsonwebtoken");
 
-const userController = express.Router();
+const Auth = express.Router();
 
-userController.post("/login", async (req, res) => {
+Auth.post("/login", async (req, res) => {
   const { email, password } = req.body;
 
-  const user = await userModel.findOne({ email });
+  const user = await User.findOne({ email });
   if (!user) {
-    return res.status(401).send("Utilisateur non trouvé");
+    return res.status(401).json({ message: "Utilisateur non trouvé" });
   }
 
-  if (user.password !== password) {
-    return res.status(401).send("Mot de passe incorrect");
+  const isPasswordValid = await bcrypt.compare(password, user.password);
+  if (!isPasswordValid) {
+    return res.status(401).json({ message: "Mot de passe incorrect" });
   }
 
   const token = jwt.sign({ userId: user.id }, process.env.JWT_SECRET, { expiresIn: "1h" });
   res.json({ token });
 });
 
-userController.post("/register", async (req, res) => {
-  const { email, password, nom, prenom } = req.body;
-
-  const userExists = await userModel.findOne({ email });
-  if (userExists) {
-    return res.status(400).send("L'adresse e-mail est déjà utilisée");
-  }
-
-  const user = new userModel({
-    email,
-    password,
-    nom,
-    prenom,
-  });
-
-  await user.save();
-
-  const token = jwt.sign({ userId: user.id }, process.env.JWT_SECRET, { expiresIn: "1h" });
-  res.json({ token });
-});
-
-module.exports = userController;
+module.exports = Auth;
