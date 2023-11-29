@@ -1,70 +1,85 @@
 import React, { useState } from "react";
-import { Button, Form, FormGroup, Input, Label } from "react-bootstrap";
-import { axios } from "axios";
+import { Button, Form, Input, Label } from "react-bootstrap";
+import axios from "axios";
 
-const CreateProduitComponent = () => {
-  const [produit, setProduit] = useState({
-    reference: "",
-    libelle: "",
-    prix: "",
-  });
+const CreateProduit = () => {
+  const [nom, setNom] = useState("");
+  const [description, setDescription] = useState("");
+  const [prix, setPrix] = useState(0);
+  const [quantite, setQuantite] = useState(0);
+  const [categorie, setCategorie] = useState("");
+  const [image, setImage] = useState("");
 
-  const handleSubmit = (event) => {
-    event.preventDefault();
+  const handleSubmit = async (e) => {
+    e.preventDefault();
 
-    axios
-      .post("/api/produits", produit)
-      .then((response) => {
-        setProduit(response.data);
-        window.location.href = "/produits";
-      })
-      .catch((error) => {
-        console.error(error);
-      });
+    const data = {
+      nom,
+      description,
+      prix,
+      quantite,
+      categorie,
+      image,
+    };
+
+    await axios.post("/gescom/compta/produits", data);
+
+    window.location.href = "/gescom/compta/produits";
   };
 
   return (
-    <div className="container">
-      <h1>Créer un produit</h1>
-
-      <Form onSubmit={handleSubmit}>
-        <FormGroup>
-          <Label for="reference">Référence</Label>
-          <Input
-            type="text"
-            name="reference"
-            id="reference"
-            value={produit.reference}
-            onChange={(event) => setProduit({ ...produit, reference: event.target.value })}
-          />
-        </FormGroup>
-
-        <FormGroup>
-          <Label for="libelle">Libellé</Label>
-          <Input
-            type="text"
-            name="libelle"
-            id="libelle"
-            value={produit.libelle}
-            onChange={(event) => setProduit({ ...produit, libelle: event.target.value })}
-          />
-        </FormGroup>
-
-        <FormGroup>
-          <Label for="prix">Prix</Label>
-          <Input
-            type="number"
-            name="prix"
-            id="prix"
-            value={produit.prix}
-            onChange={(event) => setProduit({ ...produit, prix: event.target.value })}
-          />
-        </FormGroup>
-
-        <Button type="submit">Enregistrer</Button>
-      </Form>
-    </div>
+    <Form onSubmit={handleSubmit}>
+      <Label for="nom">Nom</Label>
+      <Input
+        type="text"
+        id="nom"
+        placeholder="Nom du produit"
+        value={nom}
+        onChange={(e) => setNom(e.target.value)}
+      />
+      <Label for="description">Description</Label>
+      <Input
+        type="text"
+        id="description"
+        placeholder="Description du produit"
+        value={description}
+        onChange={(e) => setDescription(e.target.value)}
+      />
+      <Label for="prix">Prix</Label>
+      <Input
+        type="number"
+        id="prix"
+        placeholder="Prix du produit"
+        value={prix}
+        onChange={(e) => setPrix(e.target.value)}
+      />
+      <Label for="quantite">Quantité</Label>
+      <Input
+        type="number"
+        id="quantite"
+        placeholder="Quantité du produit"
+        value={quantite}
+        onChange={(e) => setQuantite(e.target.value)}
+      />
+      <Label for="categorie">Catégorie</Label>
+      <Input
+        type="text"
+        id="categorie"
+        placeholder="Catégorie du produit"
+        value={categorie}
+        onChange={(e) => setCategorie(e.target.value)}
+      />
+      <Label for="image">Image</Label>
+      <Input
+        type="text"
+        id="image"
+        placeholder="URL de l'image"
+        value={image}
+        onChange={(e) => setImage(e.target.value)}
+      />
+      <Button type="submit">Créer</Button>
+    </Form>
   );
 };
 
-export default CreateProduitComponent;
+export default CreateProduit;

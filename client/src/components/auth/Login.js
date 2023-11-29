@@ -1,70 +1,58 @@
-import React, { useState } from "react";
-import { BrowserRouter } from "react-router-dom";
-import axios from "axios";
-
-import Navbar from "../common/Navbar";
+import React from 'react';
+import { Input, Button } from 'react-bootstrap';
+import axios from "axios"
 
 const Login = () => {
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
-  const [option, setOption] = useState("gescom");
+  const [email, setEmail] = React.useState('');
+  const [password, setPassword] = React.useState('');
 
-  const handleSubmit = (e) => {
-    e.preventDefault();
+  const handleSubmit = (event) => {
+    event.preventDefault();
 
-    axios
-      .post("/api/login", {
+    // Send login request to server
+    axios.fetch('http://localhost:5000/api/login', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
         email,
         password,
-        option,
-      })
-      .then((response) => {
-        if (response.data.success) {
-          window.location.href = "/";
+      }),
+    })
+      .then((response) => response.json())
+      .then((data) => {
+        if (data.success) {
+          // Login successful
+          window.location.href = '/dashboard';
         } else {
-          alert(response.data.message);
+          // Login failed
+          alert('Login failed');
         }
-      })
-      .catch((error) => {
-        console.log(error);
       });
   };
 
   return (
-    <BrowserRouter>
-      <div>
-        <Navbar />
-        <h1>Connexion</h1>
-        <form onSubmit={handleSubmit}>
-          <div>
-            <label htmlFor="email">Email</label>
-            <input
-              type="email"
-              name="email"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-            />
-          </div>
-          <div>
-            <label htmlFor="password">Mot de passe</label>
-            <input
-              type="password"
-              name="password"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-            />
-          </div>
-          <div>
-            <label htmlFor="option">Option</label>
-            <select name="option" onChange={(e) => setOption(e.target.value)}>
-              <option value="gescom">Gescom</option>
-              <option value="compta">Compta</option>
-            </select>
-          </div>
-          <button type="submit">Se connecter</button>
-        </form>
-      </div>
-    </BrowserRouter>
+    <div className="Login">
+      <h1>Login</h1>
+      <form onSubmit={handleSubmit}>
+        <Input
+          type="email"
+          placeholder="Enter email"
+          value={email}
+          onChange={(event) => setEmail(event.target.value)}
+        />
+        <Input
+          type="password"
+          placeholder="Enter password"
+          value={password}
+          onChange={(event) => setPassword(event.target.value)}
+        />
+        <Button type="submit" variant="primary">
+          Login
+        </Button>
+      </form>
+    </div>
   );
 };
 

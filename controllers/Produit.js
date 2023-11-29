@@ -1,51 +1,129 @@
 const express = require("express");
-const Produit = require("./models/Produit");
+const router = express.Router();
+const { Produit } = require("../models/Produit");
 
-const produitController = express.Router();
-
-produitController.get("/", async (req, res) => {
+// Affiche la liste des produits
+router.get("/", async (req, res) => {
   const produits = await Produit.find();
+
   res.json(produits);
 });
 
-produitController.get("/:id", async (req, res) => {
-  const produit = await Produit.findById(req.params.id);
+// Affiche les détails d'un produit
+router.get("/:id", async (req, res) => {
+  const id = req.params.id;
+
+  const produit = await Produit.findById(id);
+
+  if (!produit) {
+    res.status(404).send("Produit non trouvé");
+    return;
+  }
+
   res.json(produit);
 });
 
-produitController.post("/", async (req, res) => {
+// Crée un nouveau produit
+router.post("/", async (req, res) => {
+  const data = req.body;
+
   const produit = new Produit({
-    code: req.body.code,
-    designation: req.body.designation,
-    prixUnitaire: req.body.prixUnitaire,
-    stock: req.body.stock,
-    categorie: req.body.categorie,
+    nom: data.nom,
+    description: data.description,
+    prix: data.prix,
+    image: data.image,
   });
 
   await produit.save();
-  res.json(produit);
+
+  res.status(201).send(produit);
 });
 
-produitController.put("/:id", async (req, res) => {
-  const produit = await Produit.findByIdAndUpdate(
-    req.params.id,
-    {
-      code: req.body.code,
-      designation: req.body.designation,
-      prixUnitaire: req.body.prixUnitaire,
-      stock: req.body.stock,
-      categorie: req.body.categorie,
-    },
-    {
-      new: true,
-    }
-  );
-  res.json(produit);
+// Modifie un produit
+router.put("/:id", async (req, res) => {
+  const id = req.params.id;
+
+  const data = req.body;
+
+  const produit = await Produit.findById(id);
+
+  if (!produit) {
+    res.status(404).send("Produit non trouvé");
+    return;
+  }
+
+  produit.nom = data.nom || produit.nom;
+  produit.description = data.description || produit.description;
+  produit.prix = data.prix || produit.prix;
+  produit.image = data.image || produit.image;
+
+  await produit.save();
+
+  res.status(200).send(produit);
 });
 
-produitController.delete("/:id", async (req, res) => {
-  await Produit.deleteOne({ _id: req.params.id });
-  res.status(204).send();
+// Supprime un produit
+router.delete("/:id", async (req, res) => {
+  const id = req.params.id;
+
+  const produit = await Produit.findById(id);
+
+  if (!produit) {
+    res.status(404).send("Produit non trouvé");
+    return;
+  }
+
+  await produit.delete();
+
+  res.status(200).send();
 });
 
-module.exports = produitController;
+// Affiche la liste des bons de livraison d'un produit
+router.get("/:id/bonlivraisons", async (req, res) => {
+  const id = req.params.id;
+
+  const produit = await Produit.findById(id);
+
+  if (!produit) {
+    res.status(404).send("Produit non trouvé");
+    return;
+  }
+
+  const bonsLivraisons = await produit.getBonLivraisons();
+
+  res.json(bonsLivraisons);
+});
+
+// Affiche la liste des devis d'un produit
+router.get("/:id/devis", async (req, res) => {
+  const id = req.params.id;
+
+  const produit = await Produit.findById(id);
+
+  if (!produit) {
+    res.status(404).send("Produit non trouvé");
+    return;
+  }
+
+  const devis = await produit.getDevis();
+
+  res.json(devis);
+});
+
+// Affiche la liste des factures d'un produit
+router.get("/:id/factures", async (req, res) => {
+  const id = req.params.id;
+
+  const produit = await Produit.findById(id);
+
+  if (!produit) {
+    res.status(404).send("Produit non trouvé");
+    return;
+  }
+
+  const factures = await produit.getFactures();
+
+  res.json(factures);
+});
+
+module.exports = router;

@@ -1,45 +1,47 @@
-import React, { Component } from "react";
-import ReactDOM from "react-dom";
-import { BrowserRouter, Routes, Route } from "react-router-dom";
-import { Container } from "react-bootstrap";
+import React from 'react';
+import ReactDOM from 'react-dom';
+import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 
-import Home from "./pages/Home";
-import Compta from "./pages/Compta";
-import Gescom from "./pages/Gescom";
+import GescomComptaHome from "./pages/GescomComptaHome";
 import Login from "./components/auth/Login";
 import Logout from "./components/auth/Logout";
 import Register from "./components/auth/Register";
 import UserProfil from "./components/auth/UserProfil";
 import Footer from "./components/common/Footer";
 import Navbar from "./components/common/Navbar";
+import CreateClient from "./components/clients/CreateClient";
+import CreateProduit from "./components/produits/CreateProduit";
+import ProduitList from "./components/produits/ProduitList";
 
-class App extends Component {
-  render() {
-    return (
-      <>
-        <BrowserRouter>
-          <Container>
-            <Navbar />
-            <Routes>
-              <Route path="/" element={<Home />} />
-              <Route path="/compta" element={<Compta />} />
-              <Route path="/gescom" element={<Gescom />} />
-              <Route path="/login" element={<Login />} />
-              <Route path="/logout" element={<Logout />} />
-              <Route path="/register" element={<Register />} />
-              <Route path="/userprofil" element={<UserProfil />} />
-            </Routes>
-            {/* Optional: Render Footer based on route requirements */}
-            {
-              // If you want Footer to be displayed only on specific routes,
-              // move it inside the Routes component and add conditional rendering
-            }
-            <Footer />
-          </Container>
-        </BrowserRouter>
-      </>
-    );
-  }
+import 'bootstrap/dist/css/bootstrap.min.css';
+
+function App() {
+  return (
+    <Router>
+      <Routes>
+        <Route path="/navbar" element={<Navbar />} />
+        <Route path="/" element={<GescomComptaHome />} />
+        <Route path="/login" element={<Login />} />
+        <Route path="/logout" element={<Logout />} />
+        <Route path="/register" element={<Register />} />
+        <Route path="/userprofil" element={<UserProfil />} />
+        <CreateClient />
+        <CreateProduit />
+        <ProduitList />
+      <Footer />
+      </Routes>
+    </Router>
+  );
 }
 
-ReactDOM.render(<App />, document.getElementById("root"));
+ReactDOM.render(
+  <React.StrictMode>
+    <App />
+  </React.StrictMode>,
+  document.getElementById('root')
+);
+
+export default App;
+
+
+

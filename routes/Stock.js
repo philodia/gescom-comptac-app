@@ -1,49 +1,96 @@
 const express = require("express");
 const router = express.Router();
 const { Stock } = require("../models/Stock");
+const { Produit } = require("../models/Produit");
 
-// Affiche la page de gestion du stock
-router.get("/", (req, res) => {
-  const user = req.user;
+// Affiche la liste des stocks
+router.get("/", async (req, res) => {
+  const stocks = await Stock.find();
 
-  //const stocks = await Stock.find();
-
-  res.render("stock", {
-    user: user,
-    produits: produits,
-    stocks: stocks,
-  });
+  res.json(stocks);
 });
 
-// Ajoute un produit au stock
-router.post("/produit/ajouter", async (req, res) => {
-  const user = req.user;
+// Affiche les détails d'un stock
+router.get("/:id", async (req, res) => {
+  const id = req.params.id;
 
-  const produit = await Produit.findById(req.body.produit);
-  const stock = new Stock({
-    produit: produit,
-    quantité: req.body.quantité,
-  });
-  stock.user = user;
-  await stock.save();
+  const stock = await Stock.findById(id);
 
-  res.redirect("/gescom-compta/stock");
-});
-
-// Retire un produit du stock
-router.post("/produit/retirer", async (req, res) => {
-  const user = req.user;
-
-  const stock = await Stock.findById(req.body.stock);
-  const quantité = stock.quantité - req.body.quantité;
-  if (quantité < 0) {
-    res.status(400).send("La quantité demandée est supérieure à la quantité en stock");
+  if (!stock) {
+    res.status(404).send("Stock non trouvé");
+    return;
   }
 
-  stock.quantité = quantité;
+  res.json(stock);
+});
+
+// Crée un nouveau stock
+router.post("/", async (req, res) => {
+  const data = req.body;
+
+  const stock = new Stock({
+    produit: data.produit,
+    quantite: data.quantite,
+  });
+
   await stock.save();
 
-  res.redirect("/gescom-compta/stock");
+  res.status(201).send(stock);
+});
+
+// Modifie un stock
+router.put("/:id", async (req, res) => {
+  const id = req.params.id;
+
+  const data = req.body;
+
+  const stock = await Stock.findById(id);
+
+  if (!stock) {
+    res.status(404).send("Stock non trouvé");
+    return;
+  }
+
+  stock.produit = data.produit || stock.produit;
+  stock.quantite = data.quantite || stock.quantite;
+
+  await stock.save();
+
+  res.status(200).send(stock);
+});
+
+// Supprime un stock
+router.delete("/:id", async (req, res) => {
+  const id = req.params.id;
+
+  const stock = await Stock.findById(id);
+
+  if (!stock) {
+    res.status(404).send("Stock non trouvé");
+    return;
+  }
+
+  await stock.delete();
+
+  res.status(200).send();
+});
+
+// Liste des produits d'un stock
+router.get("/:id/produits", async (req, res) => {
+  const id = req.params.id;
+
+  const stock = await Stock.findById(id);
+
+  if (!stock) {
+    res.status(404).send("Stock non trouvé");
+    return;
+  }
+
+  const produits = await Produit.find({
+    _id: { $in: stock.produits }
+  });
+
+  res.json(produits);
 });
 
 module.exports = router;

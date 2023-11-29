@@ -1,57 +1,102 @@
 const express = require("express");
 const router = express.Router();
-const { User, Client, Produit, Devis } = require("../models/Devis");
+const { Devis } = require("../models/Devis");
+const { Client } = require("../models/Client");
+const { Produit } = require("../models/Produit");
 
-// Affiche la page de création d'un devis
-router.get("/nouvelle", (req, res) => {
-  const user = req.user;
+// Affiche la liste des devis
+router.get("/", async (req, res) => {
+  const devis = await Devis.find();
 
-  res.render("devis-nouvelle", {
-    user: user,
-    clients: Client.find(),
-    produits: Produit.find(),
-  });
-});
-
-// Crée un nouveau devis
-router.post("/nouvelle", async (req, res) => {
-  const user = req.user;
-
-  const devis = new Devis({
-    client: req.body.client,
-    date: req.body.date,
-    produits: req.body.produits,
-    montant: req.body.montant,
-  });
-  devis.client = await Client.findById(req.body.client);
-  devis.produits = await Produit.findByIds(req.body.produits);
-  await devis.save();
-
-  res.redirect("/gescom-compta/devis");
-});
-
-// Récupère un devis par son ID
-router.get("/:id", async (req, res) => {
-  const devis = await Devis.findById(req.params.id);
   res.json(devis);
 });
 
-// Met à jour un devis
-router.put("/:id", async (req, res) => {
-  const devis = await Devis.findById(req.params.id);
-  devis.client = req.body.client;
-  devis.date = req.body.date;
-  devis.produits = req.body.produits;
-  devis.montant = req.body.montant;
+// Affiche les détails d'un devis
+router.get("/:id", async (req, res) => {
+  const id = req.params.id;
+
+  const devis = await Devis.findById(id);
+
+  if (!devis) {
+    res.status(404).send("Devis non trouvé");
+    return;
+  }
+
+  res.json(devis);
+});
+
+// Crée un nouveau devis
+router.post("/", async (req, res) => {
+  const data = req.body;
+
+  const devis = new Devis({
+    client: data.client,
+    date: data.date,
+    reference: data.reference,
+    etat: data.etat,
+    produits: data.produits,
+  });
+
   await devis.save();
 
-  res.redirect("/gescom-compta/devis");
+  res.status(201).send(devis);
+});
+
+// Modifie un devis
+router.put("/:id", async (req, res) => {
+  const id = req.params.id;
+
+  const data = req.body;
+
+  const devis = await Devis.findById(id);
+
+  if (!devis) {
+    res.status(404).send("Devis non trouvé");
+    return;
+  }
+
+  devis.client = data.client || devis.client;
+  devis.date = data.date || devis.date;
+  devis.reference = data.reference || devis.reference;
+  devis.etat = data.etat || devis.etat;
+  devis.produits = data.produits || devis.produits;
+
+  await devis.save();
+
+  res.status(200).send(devis);
 });
 
 // Supprime un devis
 router.delete("/:id", async (req, res) => {
-  await Devis.findByIdAndDelete(req.params.id);
-  res.sendStatus(200);
+  const id = req.params.id;
+
+  const devis = await Devis.findById(id);
+
+  if (!devis) {
+    res.status(404).send("Devis non trouvé");
+    return;
+  }
+
+  await devis.delete();
+
+  res.status(200).send();
 });
+
+// Liste des produits d'un devis
+router.get("/:id/produits", async (req, res) => {
+  const id = req.params.id;
+
+  const devis = await Devis.findById(id);
+
+  if (!devis) {
+    res.status(404).send("Devis non trouvé");
+    return;
+  }
+
+  const produits = await Produit.find({ _id: { $in: devis.produits } });
+
+  res.json(produits);
+});
+
 
 module.exports = router;

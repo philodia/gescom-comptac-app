@@ -1,49 +1,135 @@
 const express = require("express");
-const Client = require("./models/Client");
+const router = express.Router();
+const { Client } = require("../models/Client");
 
-const clientController = express.Router();
-
-clientController.get("/", async (req, res) => {
+// Affiche la liste des clients
+router.get("/", async (req, res) => {
   const clients = await Client.find();
+
   res.json(clients);
 });
 
-clientController.get("/:id", async (req, res) => {
-  const client = await Client.findById(req.params.id);
+// Affiche les détails d'un client
+router.get("/:id", async (req, res) => {
+  const id = req.params.id;
+
+  const client = await Client.findById(id);
+
+  if (!client) {
+    res.status(404).send("Client non trouvé");
+    return;
+  }
+
   res.json(client);
 });
 
-clientController.post("/", async (req, res) => {
+// Crée un nouveau client
+router.post("/", async (req, res) => {
+  const data = req.body;
+
   const client = new Client({
-    nom: req.body.nom,
-    adresse: req.body.adresse,
-    telephone: req.body.telephone,
-    email: req.body.email,
+    nom: data.nom,
+    prenom: data.prenom,
+    email: data.email,
+    telephone: data.telephone,
+    adresse: data.adresse,
+    logo: data.logo,
   });
 
   await client.save();
-  res.json(client);
+
+  res.status(201).send(client);
 });
 
-clientController.put("/:id", async (req, res) => {
-  const client = await Client.findByIdAndUpdate(
-    req.params.id,
-    {
-      nom: req.body.nom,
-      adresse: req.body.adresse,
-      telephone: req.body.telephone,
-      email: req.body.email,
-    },
-    {
-      new: true,
-    }
-  );
-  res.json(client);
+// Modifie un client
+router.put("/:id", async (req, res) => {
+  const id = req.params.id;
+
+  const data = req.body;
+
+  const client = await Client.findById(id);
+
+  if (!client) {
+    res.status(404).send("Client non trouvé");
+    return;
+  }
+
+  client.nom = data.nom || client.nom;
+  client.prenom = data.prenom || client.prenom;
+  client.email = data.email || client.email;
+  client.telephone = data.telephone || client.telephone;
+  client.adresse = data.adresse || client.adresse;
+  client.logo = data.logo || client.logo;
+
+  await client.save();
+
+  res.status(200).send(client);
 });
 
-clientController.delete("/:id", async (req, res) => {
-  await Client.deleteOne({ _id: req.params.id });
-  res.status(204).send();
+// Supprime un client
+router.delete("/:id", async (req, res) => {
+  const id = req.params.id;
+
+  const client = await Client.findById(id);
+
+  if (!client) {
+    res.status(404).send("Client non trouvé");
+    return;
+  }
+
+  await client.delete();
+
+  res.status(200).send();
 });
 
-module.exports = clientController;
+// Méthodes supplémentaires
+
+// Récupère la liste des bons de livraison d'un client
+router.get("/:id/bonlivraisons", async (req, res) => {
+  const id = req.params.id;
+
+  const client = await Client.findById(id);
+
+  if (!client) {
+    res.status(404).send("Client non trouvé");
+    return;
+  }
+
+  const bonsLivraisons = await client.getBonLivraisons();
+
+  res.json(bonsLivraisons);
+});
+
+// Récupère la liste des devis d'un client
+router.get("/:id/devis", async (req, res) => {
+  const id = req.params.id;
+
+  const client = await Client.findById(id);
+
+  if (!client) {
+    res.status(404).send("Client non trouvé");
+    return;
+  }
+
+  const devis = await client.getDevis();
+
+  res.json(devis);
+});
+
+// Récupère la liste des factures d'un client
+router.get("/:id/factures", async (req, res) => {
+  const id = req.params.id;
+
+  const client = await Client.findById(id);
+
+  if (!client) {
+    res.status(404).send("Client non trouvé");
+    return;
+  }
+
+  const factures = await client.getFactures();
+
+  res.json(factures);
+});
+
+module.exports = router;

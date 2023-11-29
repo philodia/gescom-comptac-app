@@ -1,30 +1,17 @@
 const mongoose = require("mongoose");
 
-const devisSchema = new mongoose.Schema({
-  id: { type: Number, required: true, unique: true },
+const Schema = mongoose.Schema;
+
+const DevisSchema = new Schema({
+  client: { type: mongoose.Schema.Types.ObjectId, ref: "Client" },
   date: { type: Date, required: true },
-  client: { type: String, required: true },
-  produit: { type: Array, required: true },
-  total: { type: Number, required: true },
+  numero: { type: String, required: true },
+  description: { type: String, required: true },
+  montant: { type: Number, required: true },
+  status: { type: String, required: true },
 });
 
-devisSchema.post("validate", function(document, next) {
-  const produits = document.produit;
-  if (!produits || produits.length === 0) {
-    next(new Error("Le devis doit contenir au moins un produit"));
-  }
-  for (const produit of produits) {
-    if (!produit.code || produit.code.length === 0) {
-      next(new Error("Le code du produit ne doit pas être vide"));
-    }
-    if (!produit.quantite || produit.quantite <= 0) {
-      next(new Error("La quantité du produit doit être supérieure ou égale à 1"));
-    }
-    if (!produit.prix || produit.prix <= 0) {
-      next(new Error("Le prix du produit doit être supérieur ou égal à 0"));
-    }
-  }
-  next();
-});
+DevisSchema.set("timestamps", true);
+DevisSchema.set("collection", "devis");
 
-module.exports = mongoose.model("Devis", devisSchema);
+module.exports = mongoose.model("Devis", DevisSchema);

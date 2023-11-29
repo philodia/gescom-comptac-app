@@ -1,27 +1,30 @@
 import React, { useState } from "react";
-import { Button, Form, FormGroup, Input, Label } from "react-bootstrap";
-import { axios } from "axios";
+import { Button, Form, Input } from "react-bootstrap";
+import axios from "axios";
 
-const CreateClientComponent = () => {
-  const [client, setClient] = useState({
-    nom: "",
-    prenom: "",
-    email: "",
-    telephone: "",
-  });
+const CreateClient = () => {
+  const [nom, setNom] = useState("");
+  const [prenom, setPrenom] = useState("");
+  const [email, setEmail] = useState("");
+  const [telephone, setTelephone] = useState("");
+  const [adresse, setAdresse] = useState("");
+  const [logo, setLogo] = useState("");
 
-  const handleSubmit = (event) => {
-    event.preventDefault();
+  const handleSubmit = async (e) => {
+    e.preventDefault();
 
-    axios
-      .post("/api/clients", client)
-      .then((response) => {
-        setClient(response.data);
-        window.location.href = "/clients";
-      })
-      .catch((error) => {
-        console.error(error);
-      });
+    const data = {
+      nom,
+      prenom,
+      email,
+      telephone,
+      adresse,
+      logo,
+    };
+
+    await axios.post("/gescom/compta/clients", data);
+
+    window.location.href = "/";
   };
 
   return (
@@ -29,58 +32,46 @@ const CreateClientComponent = () => {
       <h1>Créer un client</h1>
 
       <Form onSubmit={handleSubmit}>
-        <FormGroup>
-          <Label for="nom">Nom</Label>
-          <Input
-            type="text"
-            name="nom"
-            id="nom"
-            placeholder="Nom du client"
-            value={client.nom}
-            onChange={(event) => setClient({ ...client, nom: event.target.value })}
-          />
-        </FormGroup>
-
-        <FormGroup>
-          <Label for="prenom">Prénom</Label>
-          <Input
-            type="text"
-            name="prenom"
-            id="prenom"
-            placeholder="Prénom du client"
-            value={client.prenom}
-            onChange={(event) => setClient({ ...client, prenom: event.target.value })}
-          />
-        </FormGroup>
-
-        <FormGroup>
-          <Label for="email">Email</Label>
-          <Input
-            type="email"
-            name="email"
-            id="email"
-            placeholder="Email du client"
-            value={client.email}
-            onChange={(event) => setClient({ ...client, email: event.target.value })}
-          />
-        </FormGroup>
-
-        <FormGroup>
-          <Label for="telephone">Téléphone</Label>
-          <Input
-            type="text"
-            name="telephone"
-            id="telephone"
-            placeholder="Téléphone du client"
-            value={client.telephone}
-            onChange={(event) => setClient({ ...client, telephone: event.target.value })}
-          />
-        </FormGroup>
-
-        <Button type="submit">Enregistrer</Button>
+        <Input
+          type="text"
+          placeholder="Nom"
+          value={nom}
+          onChange={(e) => setNom(e.target.value)}
+        />
+        <Input
+          type="text"
+          placeholder="Prénom"
+          value={prenom}
+          onChange={(e) => setPrenom(e.target.value)}
+        />
+        <Input
+          type="email"
+          placeholder="Email"
+          value={email}
+          onChange={(e) => setEmail(e.target.value)}
+        />
+        <Input
+          type="tel"
+          placeholder="Téléphone"
+          value={telephone}
+          onChange={(e) => setTelephone(e.target.value)}
+        />
+        <Input
+          type="text"
+          placeholder="Adresse"
+          value={adresse}
+          onChange={(e) => setAdresse(e.target.value)}
+        />
+        <Input
+          type="file"
+          placeholder="Logo"
+          value={logo}
+          onChange={(e) => setLogo(e.target.value)}
+        />
+        <Button type="submit">Créer</Button>
       </Form>
     </div>
   );
 };
 
-export default CreateClientComponent;
+export default CreateClient;

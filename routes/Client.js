@@ -1,59 +1,134 @@
 const express = require("express");
 const router = express.Router();
-const { User, Client, Produit, Devis } = require("../models/Client");
+const { Client } = require("../models/Client");
+const { BonLivraison } = require("../models/BonLivraison");
+const { Devis } = require("../models/Devis");
+const { Facture } = require("../models/Facture");
 
-// Affiche la page de création d'un client
-router.get("/nouvelle", (req, res) => {
-  const user = req.user;
+// Affiche la liste des clients
+router.get("/", async (req, res) => {
+  const clients = await Client.find();
 
-  res.render("client-nouvelle", {
-    user: user,
-  });
+  res.json(clients);
 });
 
-// Crée un nouveau client
-router.post("/nouvelle", async (req, res) => {
-  const user = req.user;
-
-  const client = new Client({
-    nom: req.body.nom,
-    prenom: req.body.prenom,
-    email: req.body.email,
-    telephone: req.body.telephone,
-    adresse: req.body.adresse,
-    code_postal: req.body.code_postal,
-    ville: req.body.ville,
-  });
-  await client.save();
-
-  res.redirect("/gescom-compta/clients");
-});
-
-// Récupère un client par son ID
+// Affiche les détails d'un client
 router.get("/:id", async (req, res) => {
-  const client = await Client.findById(req.params.id);
+  const id = req.params.id;
+
+  const client = await Client.findById(id);
+
+  if (!client) {
+    res.status(404).send("Client non trouvé");
+    return;
+  }
+
   res.json(client);
 });
 
-// Met à jour un client
-router.put("/:id", async (req, res) => {
-  const client = await Client.findById(req.params.id);
-  client.nom = req.body.nom;
-  client.prenom = req.body.prenom;
-  client.email = req.body.email;
-  client.telephone = req.body.telephone;
-  client.adresse = req.body.adresse;
-  client.code_postal = req.body.code_postal;
-  client.ville = req.body.ville;
+// Crée un nouveau client
+router.post("/", async (req, res) => {
+  const data = req.body;
+
+  const client = new Client({
+    nom: data.nom,
+    prenom: data.prenom,
+    email: data.email,
+    telephone: data.telephone,
+    adresse: data.adresse,
+    logo: data.logo,
+  });
+
   await client.save();
 
-  res.redirect("/gescom-compta/clients");
+  res.status(201).send(client);
+});
+
+// Modifie un client
+router.put("/:id", async (req, res) => {
+  const id = req.params.id;
+
+  const data = req.body;
+
+  const client = await Client.findById(id);
+
+  if (!client) {
+    res.status(404).send("Client non trouvé");
+    return;
+  }
+
+  client.nom = data.nom || client.nom;
+  client.prenom = data.prenom || client.prenom;
+  client.email = data.email || client.email;
+  client.telephone = data.telephone || client.telephone;
+  client.adresse = data.adresse || client.adresse;
+  client.logo = data.logo || client.logo;
+
+  await client.save();
+
+  res.status(200).send(client);
 });
 
 // Supprime un client
 router.delete("/:id", async (req, res) => {
-  await Client.findByIdAndDelete(req.params.id);
-  res.sendStatus(200);
+  const id = req.params.id;
+
+  const client = await Client.findById(id);
+
+  if (!client) {
+    res.status(404).send("Client non trouvé");
+    return;
+  }
+
+  await client.delete();
+
+  res.status(200).send();
 });
 
-module.exports = router;
+// Liste des bons de livraisons d'un client
+router.get("/:id/bonlivraisons", async (req, res) => {
+  const id = req.params.id;
+
+  const client = await Client.findById(id);
+
+  if (!client) {
+    res.status(404).send("Client non trouvé");
+    return;
+  }
+
+  const bonsLivraisons = await BonLivraison.find({ client: id });
+
+  res.json(bonsLivraisons);
+});
+
+// Liste des devis d'un client
+router.get("/:id/devis", async (req, res) => {
+  const id = req.params.id;
+
+  const client = await Client.findById(id);
+
+  if (!client) {
+    res.status(404).send("Client non trouvé");
+    return;
+  }
+
+  const devis = await Devis.find({ client: id });
+
+  res.json(devis);
+});
+
+// Liste des factures d'un client
+router.get("/:id/factures", async (req, res) => {
+  const id = req.params.id;
+
+  const client = await Client.findById(id);
+
+  if (!client) {
+    res.status(404).send("Client non trouvé");
+    return;
+  }
+
+  const factures = await Facture.find({ client: id });
+
+  res.json(factures);
+});

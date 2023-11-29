@@ -1,28 +1,99 @@
 const express = require("express");
-const Facture = require("./models/Facture");
+const router = express.Router();
+const { Facture } = require("../models/Facture");
 
-const factureController = express.Router();
-
-factureController.get("/", async (req, res) => {
+// Affiche la liste des factures
+router.get("/", async (req, res) => {
   const factures = await Facture.find();
+
   res.json(factures);
 });
 
-factureController.get("/:id", async (req, res) => {
-  const facture = await Facture.findById(req.params.id);
+// Affiche les détails d'une facture
+router.get("/:id", async (req, res) => {
+  const id = req.params.id;
+
+  const facture = await Facture.findById(id);
+
+  if (!facture) {
+    res.status(404).send("Facture non trouvée");
+    return;
+  }
+
   res.json(facture);
 });
 
-factureController.post("/", async (req, res) => {
+// Crée une nouvelle facture
+router.post("/", async (req, res) => {
+  const data = req.body;
+
   const facture = new Facture({
-    date: req.body.date,
-    client: req.body.client,
-    bonLivraison: req.body.bonLivraison,
-    total: req.body.total,
+    client: data.client,
+    numero: data.numero,
+    date: data.date,
+    montant: data.montant,
+    etat: data.etat,
   });
 
   await facture.save();
-  res.json(facture);
+
+  res.status(201).send(facture);
 });
 
-module.exports = factureController;
+// Modifie une facture
+router.put("/:id", async (req, res) => {
+  const id = req.params.id;
+
+  const data = req.body;
+
+  const facture = await Facture.findById(id);
+
+  if (!facture) {
+    res.status(404).send("Facture non trouvée");
+    return;
+  }
+
+  facture.client = data.client || facture.client;
+  facture.numero = data.numero || facture.numero;
+  facture.date = data.date || facture.date;
+  facture.montant = data.montant || facture.montant;
+  facture.etat = data.etat || facture.etat;
+
+  await facture.save();
+
+  res.status(200).send(facture);
+});
+
+// Supprime une facture
+router.delete("/:id", async (req, res) => {
+  const id = req.params.id;
+
+  const facture = await Facture.findById(id);
+
+  if (!facture) {
+    res.status(404).send("Facture non trouvée");
+    return;
+  }
+
+  await facture.delete();
+
+  res.status(200).send();
+});
+
+// Affiche la liste des produits d'une facture
+router.get("/:id/produits", async (req, res) => {
+  const id = req.params.id;
+
+  const facture = await Facture.findById(id);
+
+  if (!facture) {
+    res.status(404).send("Facture non trouvée");
+    return;
+  }
+
+  const produits = await facture.getProduits();
+
+  res.json(produits);
+});
+
+module.exports = router;
